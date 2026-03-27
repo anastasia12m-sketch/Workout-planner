@@ -108,5 +108,11 @@
         function exportCSV() { let csv = "\uFEFFתאריך,שעה,סוג אימון,תרגיל,מספר סט,משקל,חזרות\n"; data.history.forEach(log => { const [date, time] = log.date.split('T'); log.data.forEach(ex => { ex.sets.forEach((s, i) => { csv += `${date},${time || ''},${log.type},"${ex.name}",${i+1},${s.weight},${s.reps}\n`; }); }); }); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `workout_history.csv`; link.click(); }
         refreshHome();
     </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+
 </body>
 </html>
