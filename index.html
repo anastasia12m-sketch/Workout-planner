@@ -1,33 +1,37 @@
-  <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Workout Pro V10</title>
+    <title>Workout Pro V12</title>
     <link rel="manifest" href="manifest.json">
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f0f2f5; --success: #27ae60; --danger: #e74c3c; }
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f0f2f5; --success: #27ae60; --danger: #e74c3c; 
+                --color-A: #3498db; --color-B: #e67e22; --color-C: #9b59b6; --color-D: #1abc9c; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--primary); }
         .container { max-width: 500px; margin: auto; padding-bottom: 40px; }
         .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; border: 1px solid #e0e0e0; }
         h1, h2 { text-align: center; margin: 10px 0; }
-        .btn { display: block; width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: bold; text-align: center; text-decoration: none; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-success { background: var(--success); color: white; }
+        .btn { display: block; width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: bold; text-align: center; text-decoration: none; color: white; }
+        .btn-A { background: var(--color-A); }
+        .btn-B { background: var(--color-B); }
+        .btn-C { background: var(--color-C); }
+        .btn-D { background: var(--color-D); }
+        .btn-success { background: var(--success); }
         .btn-outline { background: white; border: 2px solid var(--accent); color: var(--accent); }
-        .btn-small { width: auto; padding: 5px 10px; font-size: 11px; display: inline-block; margin: 0; border-radius: 5px; }
+        .btn-small { width: auto; padding: 5px 10px; font-size: 11px; display: inline-block; margin: 0; border-radius: 5px; color: inherit; border: 1px solid #ccc; }
         .ex-header { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 8px; border-radius: 6px; margin-bottom: 8px; }
         .ex-title { font-size: 17px; font-weight: 800; }
         .history-text { font-size: 12px; color: #d35400; background: #fff5e6; padding: 8px; border-radius: 5px; margin-bottom: 10px; display: block; border-right: 3px solid #e67e22; line-height: 1.4; }
         .set-grid { display: grid; grid-template-columns: 45px 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 4px; }
         .note-input { width: 100%; padding: 6px; font-size: 12px; border: 1px dashed #ccc; border-radius: 5px; margin-bottom: 12px; background: #fffdf0; text-align: right; }
         input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; text-align: center; font-size: 16px; }
-        .dt-input { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--accent); margin-bottom: 15px; font-size: 16px; font-family: inherit; }
+        .dt-input { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--accent); margin-bottom: 15px; font-size: 16px; }
         .hidden { display: none; }
-        .counters { display: flex; gap: 10px; margin-bottom: 15px; }
-        .counter-item { flex: 1; background: white; padding: 10px; border-radius: 10px; text-align: center; border-bottom: 4px solid var(--accent); }
-        .counter-val { display: block; font-size: 22px; font-weight: bold; }
+        .counters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .counter-item { background: white; padding: 8px; border-radius: 10px; text-align: center; border-bottom: 4px solid #ccc; }
+        .counter-val { display: block; font-size: 20px; font-weight: bold; }
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 30px; font-size: 14px; opacity: 0; transition: 0.3s; z-index: 999; pointer-events: none; }
         #toast.show { opacity: 1; bottom: 50px; }
     </style>
@@ -38,14 +42,18 @@
         <div id="screen-home">
             <h1>האימונים שלי</h1>
             <div class="counters">
-                <div class="counter-item">אימון A<span class="counter-val" id="cntA">0</span></div>
-                <div class="counter-item">אימון B<span class="counter-val" id="cntB">0</span></div>
+                <div class="counter-item" style="border-color: var(--color-A)">A<span class="counter-val" id="cntA">0</span></div>
+                <div class="counter-item" style="border-color: var(--color-B)">B<span class="counter-val" id="cntB">0</span></div>
+                <div class="counter-item" style="border-color: var(--color-C)">C<span class="counter-val" id="cntC">0</span></div>
+                <div class="counter-item" style="border-color: var(--color-D)">D<span class="counter-val" id="cntD">0</span></div>
             </div>
             <div id="resume-zone" class="hidden">
                 <button class="btn btn-success" style="background:#f39c12" onclick="resumeActive()">🔄 המשך אימון פעיל</button>
             </div>
-            <button class="btn btn-primary" onclick="initWorkout('A')">➕ אימון A חדש</button>
-            <button class="btn btn-primary" onclick="initWorkout('B')">➕ אימון B חדש</button>
+            <button class="btn btn-A" onclick="initWorkout('A')">➕ אימון A חדש</button>
+            <button class="btn btn-B" onclick="initWorkout('B')">➕ אימון B חדש</button>
+            <button class="btn btn-C" onclick="initWorkout('C')">➕ אימון C חדש</button>
+            <button class="btn btn-D" onclick="initWorkout('D')">➕ אימון D חדש</button>
             <hr>
             <button class="btn btn-outline" onclick="showScreen('screen-history')">📜 יומן אימונים</button>
             <button class="btn btn-outline" onclick="showScreen('screen-settings')">⚙️ ניהול תרגילים</button>
@@ -56,14 +64,15 @@
             <input type="datetime-local" id="workout-dt" class="dt-input" onchange="syncDateTime()">
             <div id="exercise-list"></div>
             <button class="btn btn-success" onclick="finalizeWorkout()">💾 שמור אימון</button>
-            <button class="btn" style="color:var(--danger)" onclick="showScreen('screen-home')">🔙 חזרה (ללא שמירה)</button>
+            <button class="btn" style="color:var(--danger); border:1px solid" onclick="showScreen('screen-home')">🔙 חזרה לבית (ללא שמירה)</button>
+            <button class="btn" style="font-size:12px; color:#999;" onclick="discardActive()">🗑️ מחק אימון פעיל</button>
         </div>
 
         <div id="screen-history" class="hidden">
             <h2>יומן אימונים</h2>
             <div id="history-list"></div>
-            <button class="btn btn-outline" style="border-color:#27ae60; color:#27ae60;" onclick="exportCSV()">📤 ייצוא כל ההיסטוריה</button>
-            <button class="btn btn-primary" onclick="showScreen('screen-home')">חזרה לבית</button>
+            <button class="btn btn-outline" onclick="exportCSV()">📤 ייצוא כל ההיסטוריה</button>
+            <button class="btn btn-A" style="color:white" onclick="showScreen('screen-home')">חזרה לבית</button>
         </div>
 
         <div id="screen-settings" class="hidden">
@@ -71,31 +80,35 @@
             <select id="edit-type" onchange="renderSettings()" class="dt-input">
                 <option value="A">אימון A</option>
                 <option value="B">אימון B</option>
+                <option value="C">אימון C</option>
+                <option value="D">אימון D</option>
             </select>
             <div id="settings-content"></div>
             <div style="display:flex; gap:5px;">
                 <input type="text" id="new-ex" placeholder="שם תרגיל...">
-                <button class="btn btn-primary" style="width:80px; margin:0;" onclick="addNewEx()">הוסף</button>
+                <button class="btn btn-A" style="width:80px; margin:0; font-size:14px;" onclick="addNewEx()">הוסף</button>
             </div>
-            <button class="btn btn-primary" onclick="showScreen('screen-home')" style="margin-top:20px;">סיום</button>
+            <button class="btn btn-A" onclick="showScreen('screen-home')" style="margin-top:20px;">סיום</button>
         </div>
     </div>
 
     <script>
-        let data = JSON.parse(localStorage.getItem('workoutDataV10')) || {
-            listA: ["סקוואט", "שכיבות סמיכה ממוט", "פשיטות גב", "פולי עליון", "סומו סקוואט", "חתירה בשיפוע", "בולגריין ספליט סקוואט", "הרחקת ידיים", "פשיטת ברך", "פלאנק", "תלויה על מתח"],
-            listB: ["תלויה על מתח", "סקוואט", "כתף קדמית", "יד קדמית", "הרחקת גומיה ישבן צידי", "כתף אחורית", "יד אחורית", "דד ליפט רגיל", "הרמת יד ישרה קדימה", "בטן הרמת רגליים", "כפיפות בטן", "מתח מוט רחב", "היפ ת'ראסט", "שכיבות סמיכה מהרצפה", "דד ליפט ספליט"],
+        let data = JSON.parse(localStorage.getItem('workoutDataV12')) || {
+            listA: ["סקוואט", "שכיבות סמיכה ממוט", "פשיטות גב", "פולי עליון"],
+            listB: ["תלויה על מתח", "סקוואט", "כתף קדמית", "יד קדמית"],
+            listC: [], listD: [],
             history: [], active: null
         };
+        let editingIndex = null;
 
-        // העברת היסטוריה מגרסאות קודמות אם קיימת
-        if (data.history.length === 0 && localStorage.getItem('workoutDataV9')) {
-            const oldData = JSON.parse(localStorage.getItem('workoutDataV9'));
-            data.history = oldData.history || [];
+        // הגירה מגרסאות קודמות
+        if (data.history.length === 0 && localStorage.getItem('workoutDataV11')) {
+            const old = JSON.parse(localStorage.getItem('workoutDataV11'));
+            data.listA = old.listA; data.listB = old.listB; data.history = old.history;
             save();
         }
 
-        function save() { localStorage.setItem('workoutDataV10', JSON.stringify(data)); }
+        function save() { localStorage.setItem('workoutDataV12', JSON.stringify(data)); }
         function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.className = "show"; setTimeout(() => t.className = "", 2000); }
         
         function showScreen(id) { 
@@ -108,168 +121,139 @@
         }
 
         function refreshHome() { 
-            document.getElementById('cntA').innerText = data.history.filter(h => h.type === 'A').length;
-            document.getElementById('cntB').innerText = data.history.filter(h => h.type === 'B').length;
-            document.getElementById('resume-zone').className = (data.active) ? '' : 'hidden';
+            ['A','B','C','D'].forEach(t => {
+                document.getElementById('cnt'+t).innerText = data.history.filter(h => h.type === t).length;
+            });
+            document.getElementById('resume-zone').className = (data.active && editingIndex === null) ? '' : 'hidden';
         }
 
         function initWorkout(type) {
+            if(data.active && !confirm("יש אימון פעיל. להתחיל חדש?")) return;
+            editingIndex = null;
             const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             data.active = { type, date: now.toISOString().slice(0,16), results: {}, setCounts: {} };
             save(); renderWorkoutView();
         }
 
-        function resumeActive() { renderWorkoutView(); }
+        function resumeActive() { editingIndex = null; renderWorkoutView(); }
+
+        function editOld(idx) {
+            editingIndex = idx; const oldLog = data.history[idx];
+            data.active = { type: oldLog.type, date: oldLog.date, results: {}, setCounts: {} };
+            oldLog.data.forEach(ex => {
+                data.active.setCounts[ex.name] = Math.max(3, ex.sets.length);
+                ex.sets.forEach((s, i) => {
+                    data.active.results[`w-${ex.name}-${i}`] = s.weight;
+                    data.active.results[`r-${ex.name}-${i}`] = s.reps;
+                    data.active.results[`n-${ex.name}-${i}`] = s.note || "";
+                });
+            });
+            renderWorkoutView();
+        }
 
         function renderWorkoutView() {
-            document.getElementById('workout-label').innerText = 'אימון ' + data.active.type;
+            document.getElementById('workout-label').innerText = 'אימון ' + data.active.type + (editingIndex !== null ? ' (עריכה)' : '');
             document.getElementById('workout-dt').value = data.active.date;
             const container = document.getElementById('exercise-list');
-            const list = data.active.type === 'A' ? data.listA : data.listB;
-            container.innerHTML = '';
+            const list = data['list' + data.active.type] || [];
+            container.innerHTML = list.length ? '' : '<p style="text-align:center">אין תרגילים ברשימה. הוסיפי בהגדרות.</p>';
 
             list.forEach((ex) => {
                 const hist = getSmartHistory(ex, data.active.date);
                 const setsToRender = data.active.setCounts[ex] || 3;
                 let setsHtml = `<div class="set-grid"><div></div><div style="font-size:10px;text-align:center;">ק"ג</div><div style="font-size:10px;text-align:center;">חזרות</div></div>`;
-                
                 for(let i=0; i < setsToRender; i++) {
-                    const w = data.active.results[`w-${ex}-${i}`] || '';
-                    const r = data.active.results[`r-${ex}-${i}`] || '';
-                    const n = data.active.results[`n-${ex}-${i}`] || '';
-                    setsHtml += `
-                        <div class="set-grid">
-                            <div style="font-size:11px; color:#666;">סט ${i+1}</div>
-                            <input type="number" value="${w}" oninput="updateActive('${ex}', ${i}, 'w', this.value)">
-                            <input type="number" value="${r}" oninput="updateActive('${ex}', ${i}, 'r', this.value)">
-                        </div>
-                        <input type="text" class="note-input" value="${n}" placeholder="הערה לסט ${i+1}..." oninput="updateActive('${ex}', ${i}, 'n', this.value)">
-                    `;
+                    const w = data.active.results[`w-${ex}-${i}`] || '', r = data.active.results[`r-${ex}-${i}`] || '', n = data.active.results[`n-${ex}-${i}`] || '';
+                    setsHtml += `<div class="set-grid">
+                        <div style="font-size:11px; color:#666;">סט ${i+1}</div>
+                        <input type="number" value="${w}" oninput="updateActive('${ex}', ${i}, 'w', this.value)">
+                        <input type="number" value="${r}" oninput="updateActive('${ex}', ${i}, 'r', this.value)">
+                    </div><input type="text" class="note-input" value="${n}" placeholder="הערה..." oninput="updateActive('${ex}', ${i}, 'n', this.value)">`;
                 }
-                container.innerHTML += `<div class="card"><div class="ex-header"><span class="ex-title">${ex}</span><button class="btn-outline btn-small" onclick="addSetToEx('${ex}')">+ סט</button></div>${hist ? `<span class="history-text">🕒 פעם קודמת:<br>${hist}</span>` : ''}<div id="sets-container-${ex}">${setsHtml}</div></div>`;
+                container.innerHTML += `<div class="card"><div class="ex-header"><span class="ex-title">${ex}</span><button class="btn-small" onclick="addSetToEx('${ex}')">+ סט</button></div>${hist ? `<span class="history-text">🕒 פעם קודמת:<br>${hist}</span>` : ''}<div id="sets-container-${ex}">${setsHtml}</div></div>`;
             });
             showScreen('screen-workout');
         }
 
-        function updateActive(exName, setIdx, field, val) {
-            data.active.results[`${field}-${exName}-${setIdx}`] = val;
-            save();
-        }
-
-        function addSetToEx(exName) {
-            data.active.setCounts[exName] = (data.active.setCounts[exName] || 3) + 1;
-            save(); renderWorkoutView();
-        }
-
+        function updateActive(ex, idx, f, v) { data.active.results[`${f}-${ex}-${idx}`] = v; save(); }
+        function addSetToEx(ex) { data.active.setCounts[ex] = (data.active.setCounts[ex] || 3) + 1; save(); renderWorkoutView(); }
         function syncDateTime() { data.active.date = document.getElementById('workout-dt').value; save(); }
 
-        function getSmartHistory(exName, currentDateStr) {
-            const currentDt = new Date(currentDateStr);
-            const eligible = data.history.filter(log => new Date(log.date) < currentDt && log.data.some(d => d.name === exName));
-            if (eligible.length === 0) return null;
+        function getSmartHistory(ex, currentDt) {
+            const eligible = data.history.filter(log => new Date(log.date) < new Date(currentDt) && log.data.some(d => d.name === ex));
+            if (!eligible.length) return null;
             eligible.sort((a, b) => new Date(b.date) - new Date(a.date));
-            const lastLog = eligible[eligible.length-1];
-            const lastEx = lastLog.data.find(d => d.name === exName);
+            const lastEx = eligible[eligible.length-1].data.find(d => d.name === ex);
             return lastEx.sets.map((s, i) => `סט ${i+1}: ${s.weight}x${s.reps}${s.note ? ' (*)' : ''}`).join(' | ');
         }
 
         function finalizeWorkout() {
-            const list = data.active.type === 'A' ? data.listA : data.listB;
-            const finalData = list.map((ex) => {
+            const list = data['list' + data.active.type];
+            const finalData = list.map(ex => {
                 let sets = [];
-                const count = data.active.setCounts[ex] || 3;
-                for(let i=0; i < count; i++) {
+                for(let i=0; i < (data.active.setCounts[ex] || 3); i++) {
                     const w = data.active.results[`w-${ex}-${i}`], r = data.active.results[`r-${ex}-${i}`], n = data.active.results[`n-${ex}-${i}`];
-                    if(w || r || n) sets.push({ weight: w || 0, reps: r || 0, note: n || "" });
+                    if(w || r || n) sets.push({ weight: w||0, reps: r||0, note: n||"" });
                 }
-                return { name: ex, sets: sets };
+                return { name: ex, sets };
             }).filter(e => e.sets.length > 0);
 
-            if(finalData.length === 0) return alert("לא הוזנו נתונים לאימון זה.");
-            data.history.push({ date: data.active.date, type: data.active.type, data: finalData });
-            data.active = null; save(); showToast("אימון נשמר! 🏆"); showScreen('screen-home');
+            if(!finalData.length) return alert("הזיני נתונים");
+            const obj = { date: data.active.date, type: data.active.type, data: finalData };
+            if (editingIndex !== null) data.history[editingIndex] = obj; else data.history.push(obj);
+            data.active = null; editingIndex = null; save(); showToast("נשמר! 🏆"); showScreen('screen-home');
         }
+
+        function discardActive() { if(confirm("למחוק אימון פעיל?")) { data.active = null; editingIndex = null; save(); showScreen('screen-home'); } }
 
         function renderHistory() {
             const container = document.getElementById('history-list');
             container.innerHTML = '';
-            [...data.history].reverse().forEach((log) => {
+            [...data.history].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(log => {
                 const realIdx = data.history.indexOf(log);
-                let detail = log.data.map(e => `<b>${e.name}:</b> ${e.sets.map(s => s.weight+'x'+s.reps + (s.note ? ` <span title="${s.note}">💬</span>` : '')).join(', ')}`).join('<br>');
-                container.innerHTML += `
-                    <div class="card" style="border-right: 5px solid ${log.type==='A'?'#3498db':'#e67e22'}">
-                        <div style="display:flex; justify-content:space-between; font-size:12px;"><b>אימון ${log.type}</b><span>${log.date.replace('T',' ')}</span></div>
-                        <div style="font-size:13px; margin:10px 0; line-height:1.5;">${detail}</div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn-small btn-outline" onclick="exportSingleCSV(${realIdx})">📥 אקסל</button>
-                            <button class="btn-small" style="color:red; background:none; border:none; cursor:pointer;" onclick="delLog(${realIdx})">🗑️ מחק</button>
-                        </div>
-                    </div>`;
+                let detail = log.data.map(e => `<b>${e.name}:</b> ${e.sets.map(s => s.weight+'x'+s.reps + (s.note ? ' 💬':'')).join(', ')}`).join('<br>');
+                container.innerHTML += `<div class="card" style="border-right: 6px solid var(--color-${log.type})">
+                    <div style="display:flex; justify-content:space-between; font-size:12px;"><b>אימון ${log.type}</b><span>${log.date.replace('T',' ')}</span></div>
+                    <div style="font-size:13px; margin:10px 0; line-height:1.5;">${detail}</div>
+                    <div style="display:flex; gap:10px;"><button class="btn-small" onclick="editOld(${realIdx})">✏️ ערוך</button>
+                    <button class="btn-small" onclick="exportSingleCSV(${realIdx})">📥 אקסל</button>
+                    <button style="color:red; background:none; border:none; font-size:12px;" onclick="delLog(${realIdx})">🗑️ מחק</button></div></div>`;
             });
         }
 
-        function delLog(idx) { if(confirm("למחוק אימון זה לצמיתות?")) { data.history.splice(idx,1); save(); renderHistory(); } }
+        function delLog(idx) { if(confirm("למחוק?")) { data.history.splice(idx,1); save(); renderHistory(); } }
 
         function renderSettings() {
             const type = document.getElementById('edit-type').value;
-            const list = type === 'A' ? data.listA : data.listB;
+            const list = data['list' + type];
             const container = document.getElementById('settings-content');
             container.innerHTML = '';
             list.forEach((ex, idx) => {
-                container.innerHTML += `
-                    <div style="display:flex; justify-content:space-between; background:#fff; padding:10px; margin-bottom:5px; border-radius:8px; border:1px solid #ddd; align-items:center;">
-                        <span style="font-size:14px; font-weight:bold;">${ex}</span>
-                        <div style="display:flex; gap:5px;">
-                            <button onclick="renameEx(${idx}, '${type}')" title="ערוך שם">✏️</button>
-                            <button onclick="moveEx(${idx},-1, '${type}')">↑</button>
-                            <button onclick="moveEx(${idx},1, '${type}')">↓</button>
-                            <button onclick="removeEx(${idx}, '${type}')" style="color:red" title="מחק">🗑️</button>
-                        </div>
-                    </div>`;
+                container.innerHTML += `<div style="display:flex; justify-content:space-between; background:#fff; padding:8px; margin-bottom:5px; border-radius:8px; border:1px solid #ddd; align-items:center;">
+                    <span>${ex}</span><div style="display:flex; gap:5px;"><button onclick="renameEx(${idx},'${type}')">✏️</button>
+                    <button onclick="moveEx(${idx},-1,'${type}')">↑</button><button onclick="moveEx(${idx},1,'${type}')">↓</button>
+                    <button onclick="removeEx(${idx},'${type}')" style="color:red">🗑️</button></div></div>`;
             });
         }
 
-        function renameEx(idx, type) {
-            const list = type === 'A' ? data.listA : data.listB;
-            const newName = prompt("שם חדש לתרגיל:", list[idx]);
-            if(newName && newName.trim() !== "") { list[idx] = newName.trim(); save(); renderSettings(); }
-        }
+        function renameEx(idx, t) { const n = prompt("שם חדש:", data['list'+t][idx]); if(n) { data['list'+t][idx] = n.trim(); save(); renderSettings(); } }
         function addNewEx() { 
-            const nameInput = document.getElementById('new-ex');
-            const name = nameInput.value.trim(); if(!name) return;
-            const type = document.getElementById('edit-type').value;
-            if(type === 'A') data.listA.push(name); else data.listB.push(name);
-            nameInput.value = ''; save(); renderSettings();
+            const i = document.getElementById('new-ex'), n = i.value.trim(), t = document.getElementById('edit-type').value;
+            if(n) { data['list'+t].push(n); i.value = ''; save(); renderSettings(); }
         }
-        function removeEx(idx, type) { if(confirm("למחוק את התרגיל מהרשימה? (זה לא ימחק אימונים ישנים מההיסטוריה)")) { if(type === 'A') data.listA.splice(idx,1); else data.listB.splice(idx,1); save(); renderSettings(); } }
-        function moveEx(idx, dir, type) {
-            const list = type === 'A' ? data.listA : data.listB;
-            if(idx+dir >= 0 && idx+dir < list.length) { [list[idx], list[idx+dir]] = [list[idx+dir], list[idx]]; save(); renderSettings(); }
-        }
-
-        function generateCSV(historyArray) {
-            let csv = "\uFEFFתאריך,סוג,תרגיל,סט,משקל,חזרות,הערה\n";
-            historyArray.forEach(log => {
-                log.data.forEach(ex => {
-                    ex.sets.forEach((s, i) => {
-                        csv += `${log.date},${log.type},"${ex.name}",${i+1},${s.weight},${s.reps},"${s.note || ''}"\n`;
-                    });
-                });
-            });
-            return csv;
-        }
-
-        function downloadCSV(csv, filename) {
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob); link.download = filename; link.click();
-        }
+        function removeEx(idx, t) { if(confirm("למחוק?")) { data['list'+t].splice(idx,1); save(); renderSettings(); } }
+        function moveEx(idx, d, t) { const l = data['list'+t]; if(idx+d >= 0 && idx+d < l.length) { [l[idx], l[idx+d]] = [l[idx+d], l[idx]]; save(); renderSettings(); } }
 
         function exportCSV() { downloadCSV(generateCSV(data.history), "history_full.csv"); }
-        function exportSingleCSV(idx) { 
-            const log = data.history[idx];
-            downloadCSV(generateCSV([log]), `workout_${log.date.split('T')[0]}.csv`); 
+        function exportSingleCSV(idx) { downloadCSV(generateCSV([data.history[idx]]), "workout.csv"); }
+        function generateCSV(arr) {
+            let csv = "\uFEFFתאריך,סוג,תרגיל,סט,משקל,חזרות,הערה\n";
+            arr.forEach(log => log.data.forEach(ex => ex.sets.forEach((s, i) => {
+                csv += `${log.date},${log.type},"${ex.name}",${i+1},${s.weight},${s.reps},"${s.note || ''}"\n`;
+            })));
+            return csv;
         }
+        function downloadCSV(csv, f) { const b = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = f; l.click(); }
 
         refreshHome();
     </script>
