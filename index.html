@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Workout Pro V14</title>
+    <title>Workout Pro V15</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root { --primary: #2c3e50; --accent: #3498db; --bg: #f0f2f5; --success: #27ae60; --danger: #e74c3c; 
@@ -41,7 +41,7 @@
     <div id="toast">נשמר!</div>
     <div class="container">
         <div id="screen-home">
-            <h1>האימונים שלי V14</h1>
+            <h1>האימונים שלי V15</h1>
             <div id="last-workout-status">טוען...</div>
             <div class="counters">
                 <div class="counter-item" style="border-color: var(--color-A)">A<span class="counter-val" id="cntA">0</span></div>
@@ -66,7 +66,7 @@
             <input type="datetime-local" id="workout-dt" class="dt-input" onchange="syncDateTime()">
             <div id="exercise-list"></div>
             <button class="btn btn-success" onclick="finalizeWorkout()">💾 שמור אימון</button>
-            <button class="btn" style="color:var(--danger); border:1px solid" onclick="showScreen('screen-home')">🔙 חזרה לבית (ללא שמירה)</button>
+            <button class="btn" style="color:var(--danger); border:1px solid" onclick="showScreen('screen-home')">🔙 חזרה (ללא שמירה)</button>
             <button class="btn" style="font-size:12px; color:#999;" onclick="discardActive()">🗑️ מחק אימון פעיל</button>
         </div>
 
@@ -106,24 +106,30 @@
         let editingIndex = null;
 
         function loadData() {
-            const stored = localStorage.getItem('workoutData_Final') || localStorage.getItem('workoutDataV13');
+            const stored = localStorage.getItem('workoutData_V15_Final');
             if (stored) {
-                const parsed = JSON.parse(stored);
-                // מיזוג רשימות כדי לא לאבד תרגילים שהמשתמש הוסיף
-                ['listA', 'listB', 'listC', 'listD'].forEach(key => {
-                    if (parsed[key]) {
-                        // אם המשתמש כבר הוסיף תרגילים, נשמור עליהם, אבל נבטיח שגם ברירות המחדל שם
-                        const combined = [...new Set([...DEFAULT_LISTS[key], ...parsed[key]])];
-                        data[key] = combined;
-                    }
-                });
-                data.history = parsed.history || [];
-                data.active = parsed.active || null;
+                data = JSON.parse(stored);
+            } else {
+                // נסיון לשאוב מגרסאות ישנות פעם אחת בלבד
+                const v14 = localStorage.getItem('workoutData_Final');
+                const v13 = localStorage.getItem('workoutDataV13');
+                const v12 = localStorage.getItem('workoutDataV12');
+                const old = v14 || v13 || v12;
+                
+                if (old) {
+                    const parsed = JSON.parse(old);
+                    data.history = parsed.history || [];
+                    // אם היו רשימות מותאמות אישית, נשתמש בהן, אחרת בברירת המחדל
+                    data.listA = parsed.listA || DEFAULT_LISTS.listA;
+                    data.listB = parsed.listB || DEFAULT_LISTS.listB;
+                    data.listC = parsed.listC || DEFAULT_LISTS.listC;
+                    data.listD = parsed.listD || DEFAULT_LISTS.listD;
+                }
+                saveData(); // שמירה למפתח החדש והקבוע
             }
-            saveData();
         }
 
-        function saveData() { localStorage.setItem('workoutData_Final', JSON.stringify(data)); }
+        function saveData() { localStorage.setItem('workoutData_V15_Final', JSON.stringify(data)); }
         function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.className = "show"; setTimeout(() => t.className = "", 2000); }
         
         function showScreen(id) { 
@@ -145,7 +151,7 @@
 
         function updateLastWorkoutStatus() {
             const statusEl = document.getElementById('last-workout-status');
-            if (data.history.length === 0) {
+            if (!data.history || data.history.length === 0) {
                 statusEl.innerText = "עוד לא בוצעו אימונים.";
                 return;
             }
@@ -208,14 +214,10 @@
         function syncDateTime() { data.active.date = document.getElementById('workout-dt').value; saveData(); }
 
         function getSmartHistory(ex, currentDt) {
-            // סינון אימונים שהתרחשו לפני האימון הנוכחי ומכילים את התרגיל
+            if (!data.history) return null;
             const eligible = data.history.filter(log => new Date(log.date) < new Date(currentDt) && log.data.some(d => d.name === ex));
             if (!eligible.length) return null;
-            
-            // מיון מהחדש לישן
             eligible.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // לקיחת האימון האחרון ביותר (אינדקס 0)
             const lastLog = eligible[0];
             const lastEx = lastLog.data.find(d => d.name === ex);
             
@@ -248,6 +250,7 @@
         function renderHistory() {
             const container = document.getElementById('history-list');
             container.innerHTML = '';
+            if (!data.history) return;
             [...data.history].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(log => {
                 const realIdx = data.history.indexOf(log);
                 const dateStr = log.date.split('T')[0].split('-').reverse().join('.');
@@ -284,7 +287,7 @@
         function removeEx(idx, t) { if(confirm("למחוק?")) { data['list'+t].splice(idx,1); saveData(); renderSettings(); } }
         function moveEx(idx, d, t) { const l = data['list'+t]; if(idx+d >= 0 && idx+d < l.length) { [l[idx], l[idx+d]] = [l[idx+d], l[idx]]; saveData(); renderSettings(); } }
 
-        function exportCSV() { downloadCSV(generateCSV(data.history), "history_full.csv"); }
+        function exportCSV() { if(data.history) downloadCSV(generateCSV(data.history), "history_full.csv"); }
         function exportSingleCSV(idx) { 
             const log = data.history[idx];
             downloadCSV(generateCSV([log]), `workout_${log.date.split('T')[0]}.csv`); 
