@@ -1,9 +1,9 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Workout Pro V13</title>
+    <title>Workout Pro V14</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root { --primary: #2c3e50; --accent: #3498db; --bg: #f0f2f5; --success: #27ae60; --danger: #e74c3c; 
@@ -41,7 +41,7 @@
     <div id="toast">נשמר!</div>
     <div class="container">
         <div id="screen-home">
-            <h1>האימונים שלי V13</h1>
+            <h1>האימונים שלי V14</h1>
             <div id="last-workout-status">טוען...</div>
             <div class="counters">
                 <div class="counter-item" style="border-color: var(--color-A)">A<span class="counter-val" id="cntA">0</span></div>
@@ -95,35 +95,32 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = 'V13';
-        let data = {
-            listA: ["סקוואט מפוצל עם רגליים אחוריות על ספסל", "סקוואט מפוצל בולגרי עם קפיצה", "לחיצת חזה עם משקולות", "חתירה עם משקולות", "פשיטות טרייספס מעבר לראש", "כפיפות ביספס", "פלאנק", "כפיפות בטן", "דלגית", "קפיצות כוח"],
-            listB: ["דדליפט רגיל", "סקואט סומו", "חתירה בישיבה", "לחיצת חזה עם מוט", "הרחקת זרועות הצידה", "כפיפות ביספס", "דלגית", "קפיצות כוח"],
-            listC: ["מכרעים", "סקוואט פוז", "לחיצת חזה בשיפוע חיובי", "פולי עליון באחיזה רחבה", "פשיטת זרועות לאחור עם משקולות", "פשיטת ברך במכונה", "כפיפות ביספס", "דלגית", "קפיצות כוח"],
-            listD: ["דדליפט רומני", "סקוואט עמוק", "לחיצת חזה באחיזה צרה", "פולי עליון באחיזה צרה", "חתירה עם משקולות בשיפוע חיובי", "פלאנק", "כפיפות בטן", "דלגית", "קפיצות כוח"],
-            history: [], active: null
+        const DEFAULT_LISTS = {
+            listA: ["סקוואט", "שכיבות סמיכה ממוט", "פשיטות גב", "פולי עליון", "סומו סקוואט", "חתירה בשיפוע", "בולגריין ספליט סקוואט", "הרחקת ידיים", "פשיטת ברך", "פלאנק", "תלויה על מתח", "דלגית", "קפיצות כוח"],
+            listB: ["תלויה על מתח", "סקוואט", "כתף קדמית", "יד קדמית", "הרחקת גומיה ישבן צידי", "כתף אחורית", "יד אחורית", "דד ליפט רגיל", "הרמת יד ישרה קדימה", "בטן הרמת רגליים", "כפיפות בטן", "מתח מוט רחב", "היפ ת'ראסט", "שכיבות סמיכה מהרצפה", "דד ליפט ספליט", "דלגית", "קפיצות כוח"],
+            listC: ["סקוואט", "מכרעים", "מתח מוט רחב", "לחיצת חזה רגילה", "לחיצת חזה בשיפוע חיובי", "פולי עליון", "חתירה במכונה / מוט", "כפיפות בטן", "פלאנק", "דלגית", "קפיצות כוח"],
+            listD: ["סקוואט", "היפ ת'ראסט", "סומו סקוואט", "דד ליפט רומני", "לחיצת חזה רחב", "כתף קדמית", "יד אחורית", "פשיטות גב", "בטן הרמת רגליים", "דלגית", "קפיצות כוח"]
         };
+
+        let data = { ...DEFAULT_LISTS, history: [], active: null };
         let editingIndex = null;
 
         function loadData() {
-            const stored = localStorage.getItem('workoutData_Final');
+            const stored = localStorage.getItem('workoutData_Final') || localStorage.getItem('workoutDataV13');
             if (stored) {
-                data = JSON.parse(stored);
-                // הגירה במידה ורשימות מסוימות חסרות
-                ['listA', 'listB', 'listC', 'listD'].forEach(list => {
-                    if (!data[list]) data[list] = [];
+                const parsed = JSON.parse(stored);
+                // מיזוג רשימות כדי לא לאבד תרגילים שהמשתמש הוסיף
+                ['listA', 'listB', 'listC', 'listD'].forEach(key => {
+                    if (parsed[key]) {
+                        // אם המשתמש כבר הוסיף תרגילים, נשמור עליהם, אבל נבטיח שגם ברירות המחדל שם
+                        const combined = [...new Set([...DEFAULT_LISTS[key], ...parsed[key]])];
+                        data[key] = combined;
+                    }
                 });
-            } else {
-                // בדיקה אם קיימים נתונים בגרסה קודמת (V12)
-                const storedOld = localStorage.getItem('workoutDataV12');
-                if (storedOld) {
-                    const oldData = JSON.parse(storedOld);
-                    data.history = oldData.history || [];
-                    saveData();
-                } else {
-                    saveData(); // יצירת נתונים התחלתיים
-                }
+                data.history = parsed.history || [];
+                data.active = parsed.active || null;
             }
+            saveData();
         }
 
         function saveData() { localStorage.setItem('workoutData_Final', JSON.stringify(data)); }
@@ -149,10 +146,11 @@
         function updateLastWorkoutStatus() {
             const statusEl = document.getElementById('last-workout-status');
             if (data.history.length === 0) {
-                statusEl.innerText = "עוד לא בוצעו אימונים. בהצלחה!";
+                statusEl.innerText = "עוד לא בוצעו אימונים.";
                 return;
             }
-            const lastLog = [...data.history].sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+            const sortedHistory = [...data.history].sort((a,b) => new Date(b.date) - new Date(a.date));
+            const lastLog = sortedHistory[0];
             const dateStr = lastLog.date.split('T')[0].split('-').reverse().join('.');
             statusEl.innerHTML = `האימון האחרון שבוצע: <b> אימון ${lastLog.type} </b> בתאריך <b> ${dateStr} </b>`;
         }
@@ -186,7 +184,7 @@
             document.getElementById('workout-dt').value = data.active.date;
             const container = document.getElementById('exercise-list');
             const list = data['list' + data.active.type] || [];
-            container.innerHTML = list.length ? '' : '<p style="text-align:center">אין תרגילים ברשימה. הוסיפי בהגדרות.</p>';
+            container.innerHTML = list.length ? '' : '<p style="text-align:center">אין תרגילים ברשימה.</p>';
 
             list.forEach((ex) => {
                 const hist = getSmartHistory(ex, data.active.date);
@@ -210,16 +208,22 @@
         function syncDateTime() { data.active.date = document.getElementById('workout-dt').value; saveData(); }
 
         function getSmartHistory(ex, currentDt) {
+            // סינון אימונים שהתרחשו לפני האימון הנוכחי ומכילים את התרגיל
             const eligible = data.history.filter(log => new Date(log.date) < new Date(currentDt) && log.data.some(d => d.name === ex));
             if (!eligible.length) return null;
+            
+            // מיון מהחדש לישן
             eligible.sort((a, b) => new Date(b.date) - new Date(a.date));
-            const lastEx = eligible[eligible.length-1].data.find(d => d.name === ex);
+            
+            // לקיחת האימון האחרון ביותר (אינדקס 0)
+            const lastLog = eligible[0];
+            const lastEx = lastLog.data.find(d => d.name === ex);
             
             const setsStr = lastEx.sets.map((s, i) => `סט ${i+1}: ${s.weight}x${s.reps}`).join(' | ');
             const notesArray = lastEx.sets.map((s, i) => s.note ? `${i+1}: ${s.note}` : null).filter(n => n);
             const notesStr = notesArray.length ? `(${notesArray.join(', ')})` : '';
 
-            return `🕒 פעם קודמת:<br>${setsStr}${notesStr ? `<br>${notesStr}` : ''}`;
+            return `🕒 פעם אחרונה:<br>${setsStr}${notesStr ? `<br>${notesStr}` : ''}`;
         }
 
         function finalizeWorkout() {
@@ -233,7 +237,7 @@
                 return { name: ex, sets };
             }).filter(e => e.sets.length > 0);
 
-            if(!finalData.length) return alert("הזיני נתונים לאימון");
+            if(!finalData.length) return alert("הזיני נתונים");
             const obj = { date: data.active.date, type: data.active.type, data: finalData };
             if (editingIndex !== null) data.history[editingIndex] = obj; else data.history.push(obj);
             data.active = null; editingIndex = null; saveData(); showToast("נשמר! 🏆"); showScreen('screen-home');
@@ -277,7 +281,7 @@
             const i = document.getElementById('new-ex'), n = i.value.trim(), t = document.getElementById('edit-type').value;
             if(n) { data['list'+t].push(n); i.value = ''; saveData(); renderSettings(); }
         }
-        function removeEx(idx, t) { if(confirm("למחוק תרגיל מהרשימה?")) { data['list'+t].splice(idx,1); saveData(); renderSettings(); } }
+        function removeEx(idx, t) { if(confirm("למחוק?")) { data['list'+t].splice(idx,1); saveData(); renderSettings(); } }
         function moveEx(idx, d, t) { const l = data['list'+t]; if(idx+d >= 0 && idx+d < l.length) { [l[idx], l[idx+d]] = [l[idx+d], l[idx]]; saveData(); renderSettings(); } }
 
         function exportCSV() { downloadCSV(generateCSV(data.history), "history_full.csv"); }
